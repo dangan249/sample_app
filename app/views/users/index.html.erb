@@ -1,0 +1,6 @@
+<% provide(:title, "All Users") %>
+<ul>
+  <% for @item in @users %>
+    <li><%= @item.name %></li>
+  <% end %>
+</ul>
