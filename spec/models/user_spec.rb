@@ -18,6 +18,8 @@ describe User do
   it { should respond_to(:password_confirmation) }
   it { should respond_to(:authenticate) }
   
+  
+
   describe "email address with mixed case" do
     let(:mixed_case_email) { "Foo@ExAMPle.CoM" }
 
@@ -30,7 +32,7 @@ describe User do
   
   describe "return value of authenticate method" do
     before { @user.save }
-    let(:found_user) { User.find_by_email(@user.email) }
+    let(:found_user) { User.find_by_email(@user.email) } 
 
     describe "with valid password" do
       it { should == found_user.authenticate(@user.password) }
