@@ -5,6 +5,7 @@ describe User do
   before do
     @user = User.new(name: "Example User", email: "user@example.com", 
                      password: "foobar", password_confirmation: "foobar")
+    User.find_by_email(@user.email).should be_nil #nothing get save to database
   end
 
   subject { @user }
@@ -14,11 +15,16 @@ describe User do
   it { should respond_to(:name) }
   it { should respond_to(:email) }
   it { should respond_to(:password_digest) }
+  it { should respond_to(:remember_token) }
   it { should respond_to(:password) }
   it { should respond_to(:password_confirmation) }
   it { should respond_to(:authenticate) }
   
   
+  describe "remember token" do
+    before { @user.save }
+    its(:remember_token) { should_not be_blank }
+  end
 
   describe "email address with mixed case" do
     let(:mixed_case_email) { "Foo@ExAMPle.CoM" }
