@@ -7,8 +7,8 @@ class SessionsController < ApplicationController
   def create
     user = User.find_by_email(params[:session][:email].downcase)
     if user && user.authenticate(params[:session][:password])
-      sign_in user # save the cookie to user's browser and set @current_user
-      redirect_to user # go to user's page
+      sign_in user
+      redirect_back_or user # go back to the editing page or go to profile page
     else
       flash.now[:error] = 'Invalid email/password combination'
       render 'new'
