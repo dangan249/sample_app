@@ -19,13 +19,57 @@ describe User do
   it { should respond_to(:password) }
   it { should respond_to(:password_confirmation) }
   it { should respond_to(:authenticate) }
-  
+  it { should respond_to(:microposts) }
   it { should respond_to(:admin) }
-  it { should respond_to(:authenticate) }
 
   it { should be_valid }
   it { should_not be_admin }
   
+  describe "micropost associations" do
+
+    before { @user.save }
+    let!(:older_micropost) do 
+      FactoryGirl.create(:micropost, user: @user, created_at: 1.day.ago)
+    end
+    let!(:newer_micropost) do
+      FactoryGirl.create(:micropost, user: @user, created_at: 1.hour.ago)
+    end
+=begin
+This uses the let! (read “let bang”) method in place of let; 
+the reason is that let variables are lazy => only spring into existence when referenced. 
+---> We want the microposts to exist immediately
+=> so that the timestamps are in the right order and so that @user.microposts isn’t empty. 
+=end
+    it "should have the right microposts in the right order" do
+      @user.microposts.should == [newer_micropost, older_micropost]
+    end
+
+    it "should destroy associated microposts" do
+      
+      microposts = @user.microposts.dup # get a duplicated copy of the array, not a reference
+      @user.destroy
+
+      microposts.should_not be_empty # the copy should not be empty
+
+      microposts.each do |micropost|
+        Micropost.find_by_id(micropost.id).should be_nil
+      end
+    end 
+
+
+    describe "status" do
+      let(:unfollowed_post) do
+        FactoryGirl.create(:micropost, user: FactoryGirl.create(:user))
+      end
+
+      its(:feed) { should include(newer_micropost) }
+      its(:feed) { should include(older_micropost) }
+      its(:feed) { should_not include(unfollowed_post) }
+    end
+
+    
+  end
+
   describe "with admin attribute set to 'true'" do
     before do
       @user.save!
